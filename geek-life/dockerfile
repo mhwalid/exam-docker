@@ -1,0 +1,23 @@
+FROM node:20 AS builder
+
+WORKDIR /app
+
+COPY . .
+
+ENV NODE_ENV=production
+
+RUN pnpm install --production
+
+RUN ["pnpm", "run", "build"]
+
+# Étape 2 : Création de l'image de production
+FROM node:20
+
+WORKDIR /app
+
+RUN  pnpm install --production
+
+COPY --from=builder /app/dist ./dist
+
+# Exécution de l'application
+CMD ["node", "./dist/index.js"]
